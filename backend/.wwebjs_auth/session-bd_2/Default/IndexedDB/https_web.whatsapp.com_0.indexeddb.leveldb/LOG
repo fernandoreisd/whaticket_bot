@@ -1,0 +1,6 @@
+2023/03/13-10:22:13.763 3c9c84 Creating DB /www/wwwroot/whaticket-botpress/backend/.wwebjs_auth/session-bd_2/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb since it was missing.
+2023/03/13-10:22:13.811 3c9c84 Reusing MANIFEST /www/wwwroot/whaticket-botpress/backend/.wwebjs_auth/session-bd_2/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2023/03/13-10:22:14.002 3c9c7e Level-0 table #5: started
+2023/03/13-10:22:14.019 3c9c7e Level-0 table #5: 7374 bytes OK
+2023/03/13-10:22:14.039 3c9c7e Delete type=0 #3
+2023/03/13-10:22:14.042 3c9c7e Manual compaction at level-0 from '\x00\x01\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x02\x00\x00\x00' @ 0 : 0; will stop at (end)

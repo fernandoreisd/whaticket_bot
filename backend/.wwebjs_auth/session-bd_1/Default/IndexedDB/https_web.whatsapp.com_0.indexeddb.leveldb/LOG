@@ -1,0 +1,14 @@
+2023/03/13-18:41:44.990 3d3db1 Reusing MANIFEST /www/wwwroot/whaticket-botpress/backend/.wwebjs_auth/session-bd_1/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2023/03/13-18:41:44.991 3d3db1 Recovering log #403
+2023/03/13-18:41:45.100 3d3db1 Reusing old log /www/wwwroot/whaticket-botpress/backend/.wwebjs_auth/session-bd_1/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000403.log 
+2023/03/14-08:32:16.169 3e2a78 Level-0 table #409: started
+2023/03/14-08:32:16.258 3e2a78 Level-0 table #409: 1287973 bytes OK
+2023/03/14-08:32:16.296 3e2a78 Delete type=0 #403
+2023/03/14-08:32:16.671 3e2a78 Compacting 1@1 + 2@2 files
+2023/03/14-08:32:16.888 3e2a78 Generated table #410@1: 52254 keys, 2225419 bytes
+2023/03/14-08:32:16.992 3e2a78 Generated table #411@1: 31856 keys, 1228450 bytes
+2023/03/14-08:32:16.992 3e2a78 Compacted 1@1 + 2@2 files => 3453869 bytes
+2023/03/14-08:32:17.010 3e2a78 compacted to: files[ 0 0 2 0 0 0 0 ]
+2023/03/14-08:32:17.010 3e2a78 Delete type=2 #409
+2023/03/14-08:32:17.010 3e2a78 Delete type=2 #406
+2023/03/14-08:32:17.011 3e2a78 Delete type=2 #405
