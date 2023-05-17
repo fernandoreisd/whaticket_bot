@@ -67,14 +67,30 @@ const FindOrCreateTicketService = async (
   }
 
   if (!ticket) {
-    ticket = await Ticket.create({
-      contactId: groupContact ? groupContact.id : contact.id,
-      status: "pending",
-      isGroup: !!groupContact,
-      unreadMessages,
-      whatsappId
-    });
-    
+
+        //ATIVA/DESATIVA BOTPRESS
+        var botpress = true
+        
+        if(botpress){
+            ticket = await Ticket.create({
+                contactId: groupContact ? groupContact.id : contact.id,
+                //status: "pending",
+                //Abre ticket com status open para o userId BOT (id = 2)
+                status: "open",
+                userId: 2,
+                isGroup: !!groupContact,
+                unreadMessages,
+                whatsappId
+            });
+        }else{    
+            ticket = await Ticket.create({
+              contactId: groupContact ? groupContact.id : contact.id,
+              status: "pending",
+              isGroup: !!groupContact,
+              unreadMessages,
+              whatsappId
+            });
+          }
     let ticket_all = await Ticket.findAll({
           where: {
             status: {
@@ -90,8 +106,7 @@ const FindOrCreateTicketService = async (
               r.save();
             });
           }
-       })    
-    
+       })  
   }
 
   ticket = await ShowTicketService(ticket.id);

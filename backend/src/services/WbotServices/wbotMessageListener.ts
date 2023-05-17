@@ -1,3 +1,4 @@
+const axios = require('axios')
 import { join } from "path";
 import { promisify } from "util";
 import { writeFile } from "fs";
@@ -73,6 +74,7 @@ catch (err) {
   const contact = CreateOrUpdateContactService(contactData);
   return contact;
 }};
+
 
 const verifyQuotedMessage = async (
   msg: WbotMessage
@@ -337,6 +339,12 @@ const handleMessage = async (
       formatBody(whatsapp.farewellMessage, contact) === msg.body
     )
       return;
+	  
+   	//SETA SE A MENSAGEM E DE ENTRADA (in) OU DE SAIDA (out)
+    const direction = msg.fromMe  
+
+    //console.log(quotedMsg)
+
 
     /*const ticket = await FindOrCreateTicketService(
       contact,
@@ -470,6 +478,390 @@ const handleMessage = async (
         console.log(error);
       }
     } */
+	
+	        /**********************************************************************************************************/
+        //INTEGRAÇÃO WHATICKET BOTPRESS
+        //userId ==> é o id do usuario bot no whaticket
+        //direction ==> false - mensagens de entrada1	
+        //WhatsappId = whatsapp.id
+        
+        console.log('/************************DEFINE A URL DO BOT DEPENDENDO DO WHATSAPPID**************************************')
+        var urlBot = `http://181.189.44.110:3000/api/v1/bots/clinica_mama_1/converse/${contact.number}`
+
+        switch(whatsapp.id){
+            default:
+                console.log(urlBot)
+                console.log(ticket.userId,direction,msg.type)
+        }        
+        console.log('/**********************************************************************************************************')
+
+        if (ticket.userId === 2 && direction == false && msg.type !== "call_log") {
+
+            const msgBotPress = msg.body
+            let msgText;
+            let bot_msg = {
+                "type": "text",
+                "text": msgBotPress
+            }
+
+            try {
+                const { data } = await axios.post(urlBot, bot_msg)
+
+                console.log(data)
+
+                for (var i = 0; i < data.responses.length; i++) {
+                    var type = data.responses[i].type
+                    switch (type) {
+                        case "text":
+                            msgText = data.responses[i].text
+                            //msgText ==> end indica q o fluxo encerrou no BotPress
+                            //O ticket retorna para fila para um atendente poder seguir o atendimento
+                            console.log(msgText)
+                            
+                            let option = msgText.split(":")
+                            let bot_status = "pending" 
+                            let bot_userId = null   
+                            let bot_queueId = null   
+
+                            switch(option[0]){
+                                case 'end':
+                                    if(!['1','2','3','4','5','6','7','8','9','0'].includes(option[1])){
+                                        if(option[1] !== 'fha'){
+                                            option[1] = '1'
+                                        }
+                                    }   
+                                                                   
+                                    switch(option[1]){
+                                        case '1':
+                                            msgText = '*Marcação de Consultas e Exames*\r\n'
+                                            +'Por favor, informe os seguinte dados para atendimento:\r\n'
+                                            +'Nome Completo:\r\n'
+                                            +'Data de Nascimento:\r\n'
+                                            +'Unidade (Asa Norte, Asa Sul ou Taguatinga):\r\n'
+                                            +'Convênio:\r\n'
+                                            +'Para agendar exames é necessário enviar foto do pedido médico. Caso seja consulta, informar *Especialidade* desejada\r\n'
+                                            ticket.queueId = 5                                    
+                                            bot_queueId = '5'   
+                                        break 
+                                        
+                                        case '4':
+                                            msgText = '*Ouvidoria*'
+                                            ticket.queueId = 9                                    
+                                            bot_queueId = '9'   
+                                        break 
+
+                                        case '5':
+                                            msgText = '*Cartão Anjo*'
+                                            ticket.queueId = 4                                    
+                                            bot_queueId = '4'   
+                                        break 
+                                            
+                                        default:
+                                            msgText = '*Marcação de consultas e/ou exames*'
+                                            ticket.queueId = 5 
+                                            bot_queueId = '5'                               
+                                    }
+    
+                                    await ticket.update({
+                                        status: bot_status,
+                                        userId: bot_userId,
+                                        queueId: bot_queueId
+                                    });
+                                    
+                                    //Apenas envia menssagem para o whatsapp dento do horario de atendimento
+                                    if(option[1] !== 'fha'){
+                                        const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para* ${msgText}`);
+                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                    }  
+                                break;
+
+                                case 'end_resultado_exames':
+                                    console.log('end_resultado_exames')
+                                    if(!['1','2','3','4','5','6','7','8','9','0'].includes(option[1])){
+                                        if(option[1] !== 'fha'){
+                                            option[1] = '1'
+                                        }
+                                    }  
+                                                                   
+                                    switch(option[1]){
+                                        case '1':
+                                            msgText = 'Resultado Asa Sul'
+                                            ticket.queueId = 11                                    
+                                            bot_queueId = '11'   
+                                        break    
+                                            
+                                        case '2':
+                                            msgText = 'Resultado Asa Norte'
+                                            ticket.queueId = 10 
+                                            bot_queueId = '10'                               
+                                        break    
+                                            
+                                        case '3':
+                                            msgText = 'Resultado Taguatinga'
+                                            ticket.queueId = 12 
+                                            bot_queueId = '12'                               
+                                        break;  
+                                    }
+    
+                                    await ticket.update({
+                                        status: bot_status,
+                                        userId: bot_userId,
+                                        queueId: bot_queueId
+                                    });
+                                    
+                                    //Apenas envia menssagem para o whatsapp dento do horario de atendimento
+                                    if(option[1] !== 'fha'){
+                                        const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
+                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                    }
+                                break;
+
+                                case 'end_autorizacao':
+                                    console.log('end_resultado_exames')
+                                    if(!['1','2','3','4','5','6','7','8','9','0'].includes(option[1])){
+                                        if(option[1] !== 'fha'){
+                                            option[1] = '1'
+                                        }
+                                    }                                                                     
+                                    switch(option[1]){
+                                        case '1':
+                                            msgText = '*Autorização Asa Sul*'
+                                            +'\r\nVocê selecionou a opção Autorização, envie sua documentação e caso já tenha enviado '
+                                            +'recebemos sua mensagem e em breve daremos entrada em sua solicitação em um prazo de até '
+                                            +'48 horas. Caso faltem documentos, solicitaremos através desse viés. 😉'
+                                            ticket.queueId = 2                                    
+                                            bot_queueId = '2'   
+                                        break    
+                                            
+                                        case '2':
+                                            msgText = '*Autorização Asa Norte*'
+                                            +'\r\nVocê selecionou a opção Autorização, envie sua documentação e caso já tenha enviado '
+                                            +'recebemos sua mensagem e em breve daremos entrada em sua solicitação em um prazo de até '
+                                            +'48 horas. Caso faltem documentos, solicitaremos através desse viés. 😉'
+                                            ticket.queueId = 1
+                                            bot_queueId = '1'                               
+                                        break    
+                                            
+                                        case '3':
+                                            msgText = '*Autorização Taguatinga*'
+                                            +'\r\nVocê selecionou a opção Autorização, envie sua documentação e caso já tenha enviado '
+                                            +'recebemos sua mensagem e em breve daremos entrada em sua solicitação em um prazo de até '
+                                            +'48 horas. Caso faltem documentos, solicitaremos através desse viés. 😉'
+                                            ticket.queueId = 3 
+                                            bot_queueId = '3'                               
+                                        break; 
+                                    }
+    
+                                    await ticket.update({
+                                        status: bot_status,
+                                        userId: bot_userId,
+                                        queueId: bot_queueId
+                                    });
+                                    
+                                    //Apenas envia menssagem para o whatsapp dento do horario de atendimento
+                                    if(option[1] !== 'fha'){
+                                        const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para* ${msgText}.`);
+                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                    }
+                                break;
+
+                                case 'end_medicos':
+                                    console.log('end_resultado_exames')
+                                    if(!['1','2','3','4','5','6','7','8','9','0'].includes(option[1])){
+                                        if(option[1] !== 'fha'){
+                                            option[1] = '1'
+                                        }
+                                    }  
+                                                                   
+                                    switch(option[1]){
+                                        case '1':
+                                            msgText = 'Médicos Asa Sul'
+                                            ticket.queueId = 7                                    
+                                            bot_queueId = '7'   
+                                        break;
+                                        
+                                        case '2':
+                                            msgText = 'Médicos Asa Norte'
+                                            ticket.queueId = 10                                    
+                                            bot_queueId = '10'   
+                                        break;
+
+                                        case '3':
+                                            msgText = 'Médicos Taguatinga'
+                                            ticket.queueId = 8                                    
+                                            bot_queueId = '8'   
+                                        break;
+
+                                    }
+    
+                                    await ticket.update({
+                                        status: bot_status,
+                                        userId: bot_userId,
+                                        queueId: bot_queueId
+                                    });
+                                    
+                                    //Apenas envia menssagem para o whatsapp dento do horario de atendimento
+                                    if(option[1] !== 'fha'){
+                                        const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
+                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                    }
+                                break;
+
+
+                                case 'end_angiologia_asa_sul':
+                                    console.log('end_resultado_exames')
+                                    if(!['1','2','3','4','5','6','7','8','9','0'].includes(option[1])){
+                                        if(option[1] !== 'fha'){
+                                            option[1] = '1'
+                                        }
+                                    }  
+                                                                   
+                                    switch(option[1]){
+                                        default:
+                                            msgText = 'Médicos Asa Sul->Angiologia'
+                                            ticket.queueId = 10                                    
+                                            bot_queueId = '10'   
+                                    }
+    
+                                    await ticket.update({
+                                        status: bot_status,
+                                        userId: bot_userId,
+                                        queueId: bot_queueId
+                                    });
+                                    
+                                    //Apenas envia menssagem para o whatsapp dento do horario de atendimento
+                                    if(option[1] !== 'fha'){
+                                        const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
+                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                    }
+                                break;
+
+                                case 'end_cirurgia_plastica_asa_sul':
+                                    console.log('end_resultado_exames')
+                                    if(!['1','2','3','4','5','6','7','8','9','0'].includes(option[1])){
+                                        if(option[1] !== 'fha'){
+                                            option[1] = '1'
+                                        }
+                                    }  
+                                                                   
+                                    switch(option[1]){
+                                        default:
+                                            msgText = 'Médicos Asa Sul->Cirurgia Plástica'
+                                            ticket.queueId = 10                                    
+                                            bot_queueId = '10'   
+                                    }
+    
+                                    await ticket.update({
+                                        status: bot_status,
+                                        userId: bot_userId,
+                                        queueId: bot_queueId
+                                    });
+                                    
+                                    //Apenas envia menssagem para o whatsapp dento do horario de atendimento
+                                    if(option[1] !== 'fha'){
+                                        const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
+                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                    }
+                                break;
+
+                                case 'end_ginecologia_asa_sul':
+                                    console.log('end_resultado_exames')
+                                    if(!['1','2','3','4','5','6','7','8','9','0'].includes(option[1])){
+                                        if(option[1] !== 'fha'){
+                                            option[1] = '1'
+                                        }
+                                    }  
+                                                                   
+                                    switch(option[1]){
+                                        default:
+                                            msgText = 'Médicos Asa Sul->Ginecologia'
+                                            ticket.queueId = 10                                    
+                                            bot_queueId = '10'   
+                                    }
+    
+                                    await ticket.update({
+                                        status: bot_status,
+                                        userId: bot_userId,
+                                        queueId: bot_queueId
+                                    });
+                                    
+                                    //Apenas envia menssagem para o whatsapp dento do horario de atendimento
+                                    if(option[1] !== 'fha'){
+                                        const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
+                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                    }
+                                break;
+
+                                case 'end_mastologia_asa_sul_feminino':
+                                    console.log('end_resultado_exames')
+                                    if(!['1','2','3','4','5','6','7','8','9','0'].includes(option[1])){
+                                        if(option[1] !== 'fha'){
+                                            option[1] = '1'
+                                        }
+                                    }  
+                                                                   
+                                    switch(option[1]){
+                                        default:
+                                            msgText = 'Médicos Asa Sul->Mastologia Feminino'
+                                            ticket.queueId = 10                                    
+                                            bot_queueId = '10'   
+                                    }
+    
+                                    await ticket.update({
+                                        status: bot_status,
+                                        userId: bot_userId,
+                                        queueId: bot_queueId
+                                    });
+                                    
+                                    //Apenas envia menssagem para o whatsapp dento do horario de atendimento
+                                    if(option[1] !== 'fha'){
+                                        const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
+                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                    }
+                                break;
+
+                                case 'end_mastologia_asa_sul_masculino':
+                                    console.log('end_resultado_exames')
+                                    if(!['1','2','3','4','5','6','7','8','9','0'].includes(option[1])){
+                                        if(option[1] !== 'fha'){
+                                            option[1] = '1'
+                                        }
+                                    }  
+                                                                   
+                                    switch(option[1]){
+                                        default:
+                                            msgText = 'Médicos Asa Sul->Mastologia Masculino'
+                                            ticket.queueId = 10                                    
+                                            bot_queueId = '10'   
+                                    }
+    
+                                    await ticket.update({
+                                        status: bot_status,
+                                        userId: bot_userId,
+                                        queueId: bot_queueId
+                                    });
+                                    
+                                    //Apenas envia menssagem para o whatsapp dento do horario de atendimento
+                                    if(option[1] !== 'fha'){
+                                        const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
+                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                    }
+                                break;
+
+                                default:
+                                    //Envia menssagem para o whatsapp e atualiza no whaticket
+                                    const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, msgText);
+                                    await verifyMessage(sentMessage, ticket, contact);
+                            }
+                        break;
+                    }
+                }
+            } catch (err) {
+                console.log(err)
+            }	
+		}
+        /**********************************************************************************************************/
+
 
     if(msg.type==="call_log" && callSetting==="disabled"){
       const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, "*Mensagem Automática:*\nAs chamadas de voz e vídeo estão desabilitas para esse WhatsApp, favor enviar uma mensagem de texto. Obrigado");
