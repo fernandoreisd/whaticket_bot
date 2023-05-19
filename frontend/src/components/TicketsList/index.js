@@ -193,10 +193,10 @@ const TicketsList = (props) => {
 
     const shouldUpdateTicket = (ticket) =>
       (!ticket.userId || ticket.userId === user?.id || showAll) &&
-      (!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
+      (!ticket.queueId || selectedQueueIds?.indexOf(ticket.queueId) > -1);
 
     const notBelongsToUserQueues = (ticket) =>
-      ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;
+      ticket.queueId && selectedQueueIds?.indexOf(ticket.queueId) === -1;
 
     socket.on("connect", () => {
       if (status) {
