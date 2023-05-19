@@ -108,10 +108,13 @@ const NotificationsPopOver = () => {
 		});
 
 		socket.on("appMessage", data => {
+			const queueUserIds = user.queues.map(({id}) => id);
+
 			if (
 				data.action === "create" &&
 				!data.message.read &&
-				(data.ticket.userId === user?.id || !data.ticket.userId)
+				(data.ticket.userId === user?.id || !data.ticket.userId) &&
+				queueUserIds.includes(data.ticket.queueId)
 			) {
 				setNotifications(prevState => {
 					const ticketIndex = prevState.findIndex(t => t.id === data.ticket.id);
