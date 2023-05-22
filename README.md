@@ -16,7 +16,9 @@ Para adicionar novos códigos na branch de `development` você pode seguir os se
 
 ## Passo a passo para testar localmente
 ```sh
+# caso não tenha a branch no seu local faça: git fetch --all
 git checkout development
+git pull
 ```
 ### Start Frontend
 1. `cd frontend`
