@@ -121,8 +121,8 @@ const ListTicketsService = async ({
 
     whereCondition = {
       [Op.or]: [{ userId }, { status: "pending" }],
+      status: { [Op.ne]: "closed" },
       queueId: { [Op.or]: [userQueueIds, null] },
-      unreadMessages: { [Op.gt]: 0 }
     };
   }
 
