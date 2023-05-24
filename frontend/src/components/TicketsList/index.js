@@ -182,9 +182,12 @@ const TicketsList = (props) => {
 
   useEffect(() => {
     if (!status && !searchParam) return;
+
+    const filterByUserQueue = tickets.filter((ticket) => selectedQueueIds.includes(ticket.queueId));
+
     dispatch({
       type: "LOAD_TICKETS",
-      payload: tickets,
+      payload: filterByUserQueue,
     });
   }, [tickets, status, searchParam]);
 
