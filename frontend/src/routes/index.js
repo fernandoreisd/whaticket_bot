@@ -46,6 +46,7 @@ const Routes = () => {
                 path="/quickAnswers"
                 component={QuickAnswers}
                 isPrivate
+                isAdminRoute
               />
               <Route exact path="/Settings" component={Settings} isPrivate />
               <Route exact path="/Queues" component={Queues} isPrivate />
