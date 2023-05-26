@@ -119,7 +119,11 @@ const useAuth = () => {
 		}
 	};
 
-	return { isAuth, user, loading, handleLogin, handleLogout };
+	const isAdminUser = () => {
+		return user.profile == "admin";
+	}
+
+	return { isAuth, user, loading, handleLogin, handleLogout, isAdminUser };
 };
 
 export default useAuth;
