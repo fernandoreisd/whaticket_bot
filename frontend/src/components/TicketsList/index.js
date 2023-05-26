@@ -190,6 +190,7 @@ const TicketsList = (props) => {
 
   useEffect(() => {
     const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
+    const nullSearchParam = searchParam === undefined || searchParam === null;
 
     const shouldUpdateTicket = (ticket) =>
       (!ticket.userId || ticket.userId === user?.id || showAll) &&
@@ -230,23 +231,25 @@ const TicketsList = (props) => {
       }
     });
 
-    socket.on("appMessage", (data) => {
-      if (data.action === "create" && shouldUpdateTicket(data.ticket)) {
-        dispatch({
-          type: "UPDATE_TICKET_UNREAD_MESSAGES",
-          payload: data.ticket,
-        });
-      }
-    });
+    if (nullSearchParam) {
+      socket.on("appMessage", (data) => {
+        if (data.action === "create" && shouldUpdateTicket(data.ticket)) {
+          dispatch({
+            type: "UPDATE_TICKET_UNREAD_MESSAGES",
+            payload: data.ticket,
+          });
+        }
+      });
 
-    socket.on("contact", (data) => {
-      if (data.action === "update") {
-        dispatch({
-          type: "UPDATE_TICKET_CONTACT",
-          payload: data.contact,
-        });
-      }
-    });
+      socket.on("contact", (data) => {
+        if (data.action === "update") {
+          dispatch({
+            type: "UPDATE_TICKET_CONTACT",
+            payload: data.contact,
+          });
+        }
+      });
+    }
 
     return () => {
       socket.disconnect();
