@@ -96,7 +96,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 
 			if (selectedUser) {
 				data.userId = selectedUser.id
-                data.transf = true
+        data.transf = true
 			}
 
 			if (selectedQueue && selectedQueue !== null) {
@@ -105,7 +105,7 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 				if (!selectedUser) {
 					data.status = 'pending';
 					data.userId = null;
-                    data.transf = true
+          data.transf = true
 				}
 			}
 
@@ -149,7 +149,6 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 								{...params}
 								label={i18n.t("transferTicketModal.fieldLabel")}
 								variant="outlined"
-								required
 								autoFocus
 								onChange={e => setSearchParam(e.target.value)}
 								InputProps={{
