@@ -11,6 +11,7 @@ import TicketsListSkeleton from "../TicketsListSkeleton";
 import useTickets from "../../hooks/useTickets";
 import { i18n } from "../../translate/i18n";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import constsDefault from '../../helpers/consts';
 
 const useStyles = makeStyles((theme) => ({
   ticketsListWrapper: {
@@ -182,10 +183,20 @@ const TicketsList = (props) => {
 
   useEffect(() => {
     if (!status && !searchParam) return;
-    dispatch({
+
+    if (canSelectTicketsByQueue()) {
+      const ticketsFilteredByQueue = tickets.filter((ticket) => selectedQueueIds.includes(ticket.queueId));
+      return dispatch({
+        type: "LOAD_TICKETS",
+        payload: ticketsFilteredByQueue,
+      });
+    }
+
+    return dispatch({
       type: "LOAD_TICKETS",
       payload: tickets,
     });
+
   }, [tickets, status, searchParam]);
 
   useEffect(() => {
@@ -276,6 +287,14 @@ const TicketsList = (props) => {
       loadMore();
     }
   };
+
+  const canSelectTicketsByQueue = () => {
+    const { profile } = user;
+    const profilesToSkipFilter = [constsDefault.ADMIN_PROFILE]
+
+    if (profilesToSkipFilter.includes(profile)) return;
+    return true;
+  }
 
   return (
     <Paper className={classes.ticketsListWrapper} style={style}>
