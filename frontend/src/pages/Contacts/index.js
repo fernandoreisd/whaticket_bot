@@ -130,6 +130,8 @@ const Contacts = () => {
   }, [searchParam, pageNumber]);
 
   useEffect(() => {
+    if (searchParam) return;
+
     const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
 
     socket.on("contact", (data) => {
@@ -145,7 +147,7 @@ const Contacts = () => {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [searchParam]);
 
   const handleSearch = (event) => {
     setSearchParam(event.target.value.toLowerCase());
