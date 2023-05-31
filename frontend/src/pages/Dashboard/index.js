@@ -69,7 +69,7 @@ const Dashboard = () => {
 
 	return (
 		<div>
-			<object className={classes.customObjectEmbeded} type="text/html" data="http://181.189.44.101/phpagi20/whaticket_clinica_mama.php"></object>
+			<object className={classes.customObjectEmbeded} type="text/html" data="https://crieodonto.fasterisk.com.br/phpagi20/whaticket_clinica_mama.php"></object>
 		</div>
 	)
 }
