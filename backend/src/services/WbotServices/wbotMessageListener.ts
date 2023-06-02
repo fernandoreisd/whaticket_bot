@@ -2,6 +2,7 @@ const axios = require('axios')
 import { join } from "path";
 import { promisify } from "util";
 import { writeFile } from "fs";
+import dotenv from "dotenv";
 import * as Sentry from "@sentry/node";
 
 import ListSettingsServiceOne from "../SettingServices/ListSettingsServiceOne";
@@ -34,6 +35,8 @@ import { Op } from "sequelize";
 interface Session extends Client {
   id?: number;
 }
+
+dotenv.config();
 
 const writeFileAsync = promisify(writeFile);
 
@@ -486,8 +489,8 @@ const handleMessage = async (
         //WhatsappId = whatsapp.id
         
         console.log('/************************DEFINE A URL DO BOT DEPENDENDO DO WHATSAPPID**************************************')
-        var urlBot = `http://181.189.44.110:3000/api/v1/bots/clinica_mama_1/converse/${contact.number}`
-
+        //var urlBot = `http://181.189.44.110:3000/api/v1/bots/clinica_mama_1/converse/${contact.number}`
+        var urlBot = `${process.env.URL_BOT}${contact.number}`
         switch(whatsapp.id){
             default:
                 console.log(urlBot)

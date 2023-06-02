@@ -104,10 +104,11 @@ export const update = async (
       const nome = await ShowUserService(ticketData.userId);
       const msgtxt = "Chat transferido. O(a) consultor(a) *"+nome.name+"* irá atendê-lo(a). Aguarde um momento por gentileza!";
       await SendWhatsAppMessage({body: msgtxt, ticket});
-    }/* else {
-      const msgtxt = "* Mensagem Automática:* Chat tranferido para o departamento *"+name+"*\n  Aguarde um momento, iremos atende-lo(a)!";
+    }else {
+      const {name} = await ShowQueueService(ticketData.queueId);
+      const msgtxt = "*Mensagem Automática:* Chat tranferido para o departamento *"+name+"*.\nAguarde um momento, iremos atende-lo(a)!";
       await SendWhatsAppMessage({body: msgtxt, ticket});
-    } */    
+    }
   }
 
   if (ticket.status === "closed") {

@@ -84,10 +84,16 @@ const MainListItems = (props) => {
         primary={i18n.t("mainDrawer.listItems.contacts")}
         icon={<ContactPhoneOutlinedIcon />}
       />
-      <ListItemLink
-        to="/quickAnswers"
-        primary={i18n.t("mainDrawer.listItems.quickAnswers")}
-        icon={<QuestionAnswerOutlinedIcon />}
+      <Can
+        role={user.profile}
+        perform="drawer-admin-items:view"
+        yes={() => (
+          <ListItemLink
+            to="/quickAnswers"
+            primary={i18n.t("mainDrawer.listItems.quickAnswers")}
+            icon={<QuestionAnswerOutlinedIcon />}
+          />
+        )}
       />
       <Can
         role={user.profile}
@@ -99,19 +105,19 @@ const MainListItems = (props) => {
               {i18n.t("mainDrawer.listItems.administration")}
             </ListSubheader>
             <ListItemLink
-        to="/"
-        primary="Dashboard"
-        icon={<DashboardOutlinedIcon />}
-      />
-      <ListItemLink
-        to="/connections"
-        primary={i18n.t("mainDrawer.listItems.connections")}
-        icon={
-          <Badge badgeContent={connectionWarning ? "!" : 0} color="error">
-            <SyncAltIcon />
-          </Badge>
-        }
-      />
+              to="/"
+              primary="Dashboard"
+              icon={<DashboardOutlinedIcon />}
+            />
+            <ListItemLink
+              to="/connections"
+              primary={i18n.t("mainDrawer.listItems.connections")}
+              icon={
+                <Badge badgeContent={connectionWarning ? "!" : 0} color="error">
+                  <SyncAltIcon />
+                </Badge>
+              }
+            />
             <ListItemLink
               to="/users"
               primary={i18n.t("mainDrawer.listItems.users")}

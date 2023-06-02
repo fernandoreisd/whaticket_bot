@@ -4,8 +4,8 @@ import { Route as RouterRoute, Redirect } from "react-router-dom";
 import { AuthContext } from "../context/Auth/AuthContext";
 import BackdropLoading from "../components/BackdropLoading";
 
-const Route = ({ component: Component, isPrivate = false, ...rest }) => {
-  const { isAuth, loading } = useContext(AuthContext);
+const Route = ({ component: Component, isPrivate = false, isAdminRoute = false, ...rest }) => {
+  const { isAuth, loading, isAdminUser } = useContext(AuthContext);
 
   if (!isAuth && isPrivate) {
     return (
@@ -21,6 +21,15 @@ const Route = ({ component: Component, isPrivate = false, ...rest }) => {
       <>
         {loading && <BackdropLoading />}
         <Redirect to={{ pathname: "/", state: { from: rest.location } }} />;
+      </>
+    );
+  }
+
+  if (isAuth && isPrivate && isAdminRoute && !isAdminUser()) {
+    return (
+      <>
+        {loading && <BackdropLoading />}
+        <Redirect to={{ pathname: "/tickets", state: { from: rest.location } }} />;
       </>
     );
   }

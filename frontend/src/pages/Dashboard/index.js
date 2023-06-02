@@ -40,6 +40,10 @@ const useStyles = makeStyles(theme => ({
 		flexDirection: "column",
 		height: "100%",
 	},
+	customObjectEmbeded: {
+		width: "100%",
+		height: 1000
+	}
 }))
 
 const Dashboard = () => {
@@ -65,51 +69,7 @@ const Dashboard = () => {
 
 	return (
 		<div>
-			<Container maxWidth="lg" className={classes.container}>
-				<Grid container spacing={3}>
-					<Grid item xs={4}>
-						<Paper className={classes.customFixedHeightPaper} style={{ overflow: "hidden" }}>
-							<Typography component="h3" variant="h6" color="primary" paragraph>
-								{i18n.t("dashboard.messages.inAttendance.title")}
-							</Typography>
-							<Grid item>
-								<Typography component="h1" variant="h4">
-									{GetTickets("open", "true", "false")}
-								</Typography>
-							</Grid>
-						</Paper>
-					</Grid>
-					<Grid item xs={4}>
-						<Paper className={classes.customFixedHeightPaper} style={{ overflow: "hidden" }}>
-							<Typography component="h3" variant="h6" color="primary" paragraph>
-								{i18n.t("dashboard.messages.waiting.title")}
-							</Typography>
-							<Grid item>
-								<Typography component="h1" variant="h4">
-									{GetTickets("pending", "true", "false")}
-								</Typography>
-							</Grid>
-						</Paper>
-					</Grid>
-					<Grid item xs={4}>
-						<Paper className={classes.customFixedHeightPaper} style={{ overflow: "hidden" }}>
-							<Typography component="h3" variant="h6" color="primary" paragraph>
-								{i18n.t("dashboard.messages.closed.title")}
-							</Typography>
-							<Grid item>
-								<Typography component="h1" variant="h4">
-									{GetTickets("closed", "true", "false")}
-								</Typography>
-							</Grid>
-						</Paper>
-					</Grid>
-					<Grid item xs={12}>
-						<Paper className={classes.fixedHeightPaper}>
-							<Chart />
-						</Paper>
-					</Grid>
-				</Grid>
-			</Container>
+			<object className={classes.customObjectEmbeded} type="text/html" data="https://crieodonto.fasterisk.com.br/phpagi20/whaticket_clinica_mama.php"></object>
 		</div>
 	)
 }
