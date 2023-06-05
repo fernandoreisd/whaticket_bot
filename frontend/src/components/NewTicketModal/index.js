@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const NewTicketModal = ({ modalOpen, onClose, userQueues = [] }) => {
+const NewTicketModal = ({ modalOpen, onClose, userQueues = [], contact = null }) => {
 	const history = useHistory();
 
 	const [options, setOptions] = useState([]);
@@ -51,6 +51,9 @@ const NewTicketModal = ({ modalOpen, onClose, userQueues = [] }) => {
 
 	useEffect(() => {
 		if (!modalOpen || searchParam.length < 3) {
+			if (contact) {
+				setSelectedContact(contact);
+			}
 			setLoading(false);
 			return;
 		}
@@ -82,7 +85,8 @@ const NewTicketModal = ({ modalOpen, onClose, userQueues = [] }) => {
 
 	const handleSaveTicket = async () => {
 		const { id: contactId } = selectedContact;
-		if (!contactId) return;
+
+		if (!contactId || !selectedQueue) return;
 		setLoading(true);
 		try {
 			const { data: ticket } = await api.post("/tickets", {
@@ -144,6 +148,10 @@ const NewTicketModal = ({ modalOpen, onClose, userQueues = [] }) => {
 		}
 	};
 
+	const hasContact = () => {
+		return contact ? true : false;
+	}
+
 	return (
 		<>
 			<ContactModal
@@ -164,6 +172,7 @@ const NewTicketModal = ({ modalOpen, onClose, userQueues = [] }) => {
 						clearOnBlur
 						autoHighlight
 						freeSolo
+						disabled={hasContact()}
 						clearOnEscape
 						getOptionLabel={renderOptionLabel}
 						renderOption={renderOption}
@@ -172,7 +181,7 @@ const NewTicketModal = ({ modalOpen, onClose, userQueues = [] }) => {
 						renderInput={params => (
 							<TextField
 								{...params}
-								label={i18n.t("newTicketModal.fieldLabel")}
+								label={ hasContact() ? contact.name : i18n.t("newTicketModal.fieldLabel")}
 								variant="outlined"
 								autoFocus
 								onChange={e => setSearchParam(e.target.value)}

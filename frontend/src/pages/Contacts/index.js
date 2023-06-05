@@ -25,6 +25,7 @@ import api from "../../services/api";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import ContactModal from "../../components/ContactModal";
 import ConfirmationModal from "../../components/ConfirmationModal/";
+import NewTicketModal from "../../components/NewTicketModal";
 
 import { i18n } from "../../translate/i18n";
 import MainHeader from "../../components/MainHeader";
@@ -103,6 +104,9 @@ const Contacts = () => {
   const [deletingContact, setDeletingContact] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [hasMore, setHasMore] = useState(false);
+  const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState(null);
+
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -163,21 +167,10 @@ const Contacts = () => {
     setContactModalOpen(false);
   };
 
-  const handleSaveTicket = async (contactId) => {
-    if (!contactId) return;
-    setLoading(true);
-    try {
-      const { data: ticket } = await api.post("/tickets", {
-        contactId: contactId,
-        userId: user?.id,
-        status: "open",
-      });
-      history.push(`/tickets/${ticket.id}`);
-    } catch (err) {
-      toastError(err);
-    }
-    setLoading(false);
-  };
+  const handleCreateNewTicket = (contactSelected) => {
+    setSelectedContact(contactSelected);
+    setNewTicketModalOpen(true);
+  }
 
   const hadleEditContact = (contactId) => {
     setSelectedContactId(contactId);
@@ -282,6 +275,12 @@ const Contacts = () => {
         variant="outlined"
         onScroll={handleScroll}
       >
+        <NewTicketModal
+          modalOpen={newTicketModalOpen}
+          onClose={(e) => setNewTicketModalOpen(false)}
+          userQueues={user?.queues}
+          contact={selectedContact}
+        />
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -311,7 +310,7 @@ const Contacts = () => {
                   <TableCell align="center">
                     <IconButton
                       size="small"
-                      onClick={() => handleSaveTicket(contact.id)}
+                      onClick={() => handleCreateNewTicket(contact)}
                     >
                       <WhatsAppIcon />
                     </IconButton>
