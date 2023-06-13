@@ -170,6 +170,7 @@ const TicketsManager = () => {
       <NewTicketModal
         modalOpen={newTicketModalOpen}
         onClose={(e) => setNewTicketModalOpen(false)}
+        userQueues={user?.queues}
       />
       <Paper elevation={0} square className={classes.searchContainer}>
         <SearchIcon className={classes.searchIcon} />

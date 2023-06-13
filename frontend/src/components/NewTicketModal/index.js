@@ -4,6 +4,11 @@ import { useHistory } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
+import Select from "@material-ui/core/Select";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
+import MenuItem from "@material-ui/core/MenuItem";
+import { makeStyles } from "@material-ui/core";
 
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -24,7 +29,14 @@ const filter = createFilterOptions({
 	trim: true,
 });
 
-const NewTicketModal = ({ modalOpen, onClose }) => {
+const useStyles = makeStyles((theme) => ({
+  maxWidth: {
+    width: "100%",
+		marginTop: 15
+  },
+}));
+
+const NewTicketModal = ({ modalOpen, onClose, userQueues = [], contact = null }) => {
 	const history = useHistory();
 
 	const [options, setOptions] = useState([]);
@@ -33,10 +45,15 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 	const [selectedContact, setSelectedContact] = useState(null);
 	const [newContact, setNewContact] = useState({});
 	const [contactModalOpen, setContactModalOpen] = useState(false);
+	const [selectedQueue, setSelectedQueue] = useState('');
+	const classes = useStyles();
 	const { user } = useContext(AuthContext);
 
 	useEffect(() => {
 		if (!modalOpen || searchParam.length < 3) {
+			if (contact) {
+				setSelectedContact(contact);
+			}
 			setLoading(false);
 			return;
 		}
@@ -66,12 +83,15 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		setSelectedContact(null);
 	};
 
-	const handleSaveTicket = async contactId => {
-		if (!contactId) return;
+	const handleSaveTicket = async () => {
+		const { id: contactId } = selectedContact;
+
+		if (!contactId || !selectedQueue) return;
 		setLoading(true);
 		try {
 			const { data: ticket } = await api.post("/tickets", {
 				contactId: contactId,
+				queueId: selectedQueue,
 				userId: user.id,
 				status: "open",
 			});
@@ -128,6 +148,10 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		}
 	};
 
+	const hasContact = () => {
+		return contact ? true : false;
+	}
+
 	return (
 		<>
 			<ContactModal
@@ -148,6 +172,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 						clearOnBlur
 						autoHighlight
 						freeSolo
+						disabled={hasContact()}
 						clearOnEscape
 						getOptionLabel={renderOptionLabel}
 						renderOption={renderOption}
@@ -156,16 +181,10 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 						renderInput={params => (
 							<TextField
 								{...params}
-								label={i18n.t("newTicketModal.fieldLabel")}
+								label={ hasContact() ? contact.name : i18n.t("newTicketModal.fieldLabel")}
 								variant="outlined"
 								autoFocus
 								onChange={e => setSearchParam(e.target.value)}
-								onKeyPress={e => {
-									if (loading || !selectedContact) return;
-									else if (e.key === "Enter") {
-										handleSaveTicket(selectedContact.id);
-									}
-								}}
 								InputProps={{
 									...params.InputProps,
 									endAdornment: (
@@ -180,6 +199,21 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 							/>
 						)}
 					/>
+					<FormControl variant="outlined" className={classes.maxWidth} required>
+						<InputLabel>{i18n.t("transferTicketModal.fieldQueuePlaceholder")}</InputLabel>
+						<Select
+							value={selectedQueue}
+							onChange={(e) => setSelectedQueue(e.target.value)}
+							label={i18n.t("transferTicketModal.fieldQueuePlaceholder")}
+							required={true}
+						>
+							<MenuItem value={''}>&nbsp;</MenuItem>
+							{userQueues.map((queue) => (
+								<MenuItem key={queue.id} value={queue.id}>{queue.name}</MenuItem>
+							))}
+						</Select>
+					</FormControl>
+
 				</DialogContent>
 				<DialogActions>
 					<Button
@@ -193,8 +227,8 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 					<ButtonWithSpinner
 						variant="contained"
 						type="button"
-						disabled={!selectedContact}
-						onClick={() => handleSaveTicket(selectedContact.id)}
+						disabled={!selectedContact || !selectedQueue || loading}
+						onClick={handleSaveTicket}
 						color="primary"
 						loading={loading}
 					>
