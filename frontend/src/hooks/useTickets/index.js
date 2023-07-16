@@ -14,8 +14,10 @@ const useTickets = ({
 }) => {
     const [loading, setLoading] = useState(true);
     const [hasMore, setHasMore] = useState(false);
+    const [requestFinished, setRequestFinished] = useState(false);
     const [tickets, setTickets] = useState([]);
     const [count, setCount] = useState(0);
+    const [currentTarget, setCurrentTarget] = useState(null)
 
     useEffect(() => {
         setLoading(true);
@@ -54,10 +56,14 @@ const useTickets = ({
 
                     setHasMore(data.hasMore)
                     setCount(data.count)
-                    setLoading(false)
+                    setLoading(false);
+                    setRequestFinished(true);
+                    enabledScroll()
                 } catch (err) {
                     setLoading(false)
                     toastError(err)
+                    setRequestFinished(true);
+                    enabledScroll()
                 }
             }
 
@@ -69,7 +75,7 @@ const useTickets = ({
             }
 
             fetchTickets()
-        }, 500)
+        }, 1000)
         return () => clearTimeout(delayDebounceFn)
     }, [
         searchParam,
@@ -81,7 +87,19 @@ const useTickets = ({
         withUnreadMessages,
     ])
 
-    return { tickets, loading, hasMore, count };
+    const disbledScroll = (elementHtml, scrollTop, scrollLeft) => {
+      setCurrentTarget(elementHtml);
+      elementHtml.onscroll = function() {
+          elementHtml.scrollTo(scrollLeft, scrollTop);
+      };
+    }
+
+    const enabledScroll = () => {
+      if(!currentTarget) return;
+      currentTarget.onscroll = function() {}
+    }
+
+    return { tickets, loading, hasMore, count, requestFinished, disbledScroll, setRequestFinished };
 };
 
 export default useTickets;
