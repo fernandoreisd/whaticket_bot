@@ -173,7 +173,7 @@ const TicketsList = (props) => {
     setPageNumber(1);
   }, [status, searchParam, dispatch, showAll, selectedQueueIds]);
 
-  const { tickets, hasMore, loading } = useTickets({
+  const { tickets, hasMore, loading, requestFinished, disbledScroll, setRequestFinished } = useTickets({
     pageNumber,
     searchParam,
     status,
@@ -275,13 +275,18 @@ const TicketsList = (props) => {
   }, [ticketsList]);
 
   const loadMore = () => {
+    if (!requestFinished) return;
+
     setPageNumber((prevState) => prevState + 1);
+    setRequestFinished(false);
   };
 
   const handleScroll = (e) => {
-    if (!hasMore || loading) return;
+    const { scrollTop, scrollHeight, clientHeight, scrollLeft } = e.currentTarget;
 
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    disbledScroll(e.currentTarget, scrollTop, scrollLeft);
+
+    if (!hasMore || loading) return;
 
     if (scrollHeight - (scrollTop + 100) < clientHeight) {
       loadMore();
