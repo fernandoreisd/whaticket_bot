@@ -105,7 +105,6 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	userTag: {
-		position: "absolute",
 		marginRight: 5,
 		right: 20,
 		bottom: 30,
@@ -165,7 +164,7 @@ const TicketListItem = ({ ticket }) => {
 			setLoading(false);
 		}
 		history.push(`/tickets/${id}`);
-	};	
+	};
 
 	const handleSelectTicket = id => {
 		history.push(`/tickets/${id}`);
@@ -203,13 +202,18 @@ const TicketListItem = ({ ticket }) => {
 					primary={
 						<span className={classes.contactNameWrapper}>
 							<Typography
+								style={{ flexGrow: 1 }}
 								noWrap
 								component="span"
 								variant="body2"
 								color="textPrimary"
+
 							>
 								{ticket.contact.name}
 							</Typography>
+							{ticket.whatsappId && (
+								<div className={classes.userTag} title={i18n.t("ticketsList.connectionTitle")}>{user?.name}</div>
+							)}
 							{ticket.lastMessage && (
 								<Typography
 									className={classes.lastMessageTime}
@@ -224,9 +228,6 @@ const TicketListItem = ({ ticket }) => {
 									)}
 								</Typography>
 							)}
-							{ticket.whatsappId && (
-								<div className={classes.userTag} title={i18n.t("ticketsList.connectionTitle")}>{ticket.whatsapp?.name}</div>
-							)}
 						</span>
 					}
 					secondary={
@@ -237,9 +238,11 @@ const TicketListItem = ({ ticket }) => {
 								component="span"
 								variant="body2"
 								color="textSecondary"
+								flexGrow={1}
 							>
 								{ticket.lastMessage ? (
-									<MarkdownWrapper>{ticket.lastMessage}</MarkdownWrapper>
+									<MarkdownWrapper
+									>{ticket.lastMessage}</MarkdownWrapper>
 								) : (
 									<br />
 								)}
@@ -256,7 +259,7 @@ const TicketListItem = ({ ticket }) => {
 					}
 				/>
 
-				{ticket.status === "pending" && (					
+				{ticket.status === "pending" && (
 					<ButtonWithSpinner
 						color="primary"
 						variant="contained"
@@ -267,16 +270,16 @@ const TicketListItem = ({ ticket }) => {
 					>
 						{i18n.t("ticketsList.buttons.accept")}
 					</ButtonWithSpinner>
-				)}	
+				)}
 
- 			 	{ticket.status === "pending" && (					
+				{ticket.status === "pending" && (
 					<IconButton
-					className={classes.bottomButton}
-					color="primary"
-					onClick={e => handleViewTicket(ticket.id)} >
-					<VisibilityIcon />
-				  	</IconButton>								
-				)}	
+						className={classes.bottomButton}
+						color="primary"
+						onClick={e => handleViewTicket(ticket.id)} >
+						<VisibilityIcon />
+					</IconButton>
+				)}
 			</ListItem>
 			<Divider variant="inset" component="li" />
 		</React.Fragment>
