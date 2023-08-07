@@ -13,6 +13,8 @@ import { i18n } from "../../translate/i18n";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import constsDefault from '../../helpers/consts';
 
+import api from "../../services/api";
+
 const useStyles = makeStyles((theme) => ({
   ticketsListWrapper: {
     position: "relative",
@@ -167,6 +169,17 @@ const TicketsList = (props) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [ticketsList, dispatch] = useReducer(reducer, []);
   const { user } = useContext(AuthContext);
+
+  const [agents, setAgents] = useState([]);
+
+  const loadAgents = async () => {
+    const { data } = await api.get("/users");
+    setAgents(data.users);
+  }
+
+  useEffect(() => {
+    loadAgents();
+  }, []);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -326,10 +339,10 @@ const TicketsList = (props) => {
                 ? ticketsList
                     .filter((ticket) => ticket.userId === selectedAgentId)
                     .map((ticket) => (
-                      <TicketListItem ticket={ticket} key={ticket.id} />
+                      <TicketListItem ticket={ticket} key={ticket.id} agents={agents} />
                     ))
                 : ticketsList.map((ticket) => (
-                    <TicketListItem ticket={ticket} key={ticket.id} />
+                  <TicketListItem ticket={ticket} key={ticket.id} agents={agents} />
                   ))}
             </>
           )}
