@@ -378,15 +378,15 @@ const messages = {
               "30": "30 Segundos",
               "60": "1 minuto",
               "300": "5 minutos",
-              "1800" : "30 minutos",
-              "3600" : "1 hora",
-              "7200" : "2 horas",
-              "21600" : "6 horas",
-              "43200" : "12 horas",
-              "86400" : "24 horas",
-              "172800" : "48 horas",
+              "1800": "30 minutos",
+              "3600": "1 hora",
+              "7200": "2 horas",
+              "21600": "6 horas",
+              "43200": "12 horas",
+              "86400": "24 horas",
+              "172800": "48 horas",
             },
-          },  
+          },
           call: {
             name: "Aceitar chamadas",
             options: {
@@ -397,8 +397,8 @@ const messages = {
           CheckMsgIsGroup: {
             name: "Ignorar Mensagens de Grupos",
             options: {
-                enabled: "Ativado",
-                disabled: "Desativado",
+              enabled: "Ativado",
+              disabled: "Desativado",
             },
           },
         },
@@ -406,6 +406,7 @@ const messages = {
       messagesList: {
         header: {
           assignedTo: "Pessoa Responsável:",
+          sectorTo: "Setor:",
           buttons: {
             return: "Retornar Conversa",
             resolve: "Encerrar Conversa",

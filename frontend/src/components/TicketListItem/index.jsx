@@ -251,7 +251,7 @@ const TicketListItem = (props) => {
                   color="textSecondary"
                 >
                   {ticket.lastMessage ? (
-                    <MarkdownWrapper>{ticket.lastMessage}</MarkdownWrapper>
+                    <MarkdownWrapper>{`${ticket?.contact.name}: ${ticket.lastMessage}`}</MarkdownWrapper>
                   ) : (
                     <br />
                   )}
