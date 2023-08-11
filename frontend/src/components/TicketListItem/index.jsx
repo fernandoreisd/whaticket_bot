@@ -21,6 +21,8 @@ import ButtonWithSpinner from "../ButtonWithSpinner";
 import MarkdownWrapper from "../MarkdownWrapper";
 import { Tooltip } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
+
 import toastError from "../../errors/toastError";
 
 const useStyles = makeStyles((theme) => ({
@@ -146,7 +148,9 @@ const TicketListItem = (props) => {
   const { ticketId } = useParams();
   const isMounted = useRef(true);
   const { user } = useContext(AuthContext);
+  const { whatsApps } = useContext(WhatsAppsContext);
 
+  const conection = whatsApps.filter((whats) => whats.id === ticket?.whatsappId).shift();
   const agent = agents.filter((agent) => agent?.id === ticket?.userId).shift();
 
   useEffect(() => {
@@ -293,13 +297,13 @@ const TicketListItem = (props) => {
                 variant="body2"
                 color="textPrimary"
               >
-                {ticket.whatsappId && (
+                {conection && (
                   <div
-                    id={"userTag-" + ticket.id}
+                    id={"conectionTag-" + ticket.id}
                     className={classes.userTag}
                     title={i18n.t("ticketsList.connectionTitle")}
                   >
-                    {user?.name}
+                    {conection?.name}
                   </div>
                 )}
                 {agent && (
@@ -312,14 +316,14 @@ const TicketListItem = (props) => {
                     {agent.name}
                   </div>
                 )}
-                {ticket.whatsappId && (
+                {ticket.queue && (
                   <div
                     id={"queueTag-" + ticket.id}
                     style={{ backgroundColor: ticket.queue?.color }}
                     className={classes.tagColors}
                     title={i18n.t("ticketsList.connectionTitle")}
                   >
-                    {ticket?.queue.name}
+                    {ticket.queue?.name || "Sem Fila"}
                   </div>
                 )}
               </Typography>
