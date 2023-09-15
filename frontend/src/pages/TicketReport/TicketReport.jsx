@@ -1,59 +1,60 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
-import MainContainer from "../../components/MainContainer";
-import MainHeader from "../../components/MainHeader";
-import { i18n } from "../../translate/i18n";
-import Title from "../../components/Title";
+import React, { useContext, useEffect, useReducer, useState } from 'react';
+import MainContainer from '../../components/MainContainer';
+import MainHeader from '../../components/MainHeader';
+import { i18n } from '../../translate/i18n';
+import Title from '../../components/Title';
 import {
   Button,
   FormControl,
   InputLabel,
+  MenuItem,
   Paper,
   Select,
   TableBody,
   TextField,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { green } from "@material-ui/core/colors";
+} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import { green } from '@material-ui/core/colors';
 
-import Table from "@material-ui/core/Table";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TableRowSkeleton from "../../components/TableRowSkeleton";
-import SearchIcon from "@material-ui/icons/Search";
+import Table from '@material-ui/core/Table';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TableRowSkeleton from '../../components/TableRowSkeleton';
+import SearchIcon from '@material-ui/icons/Search';
 
-import { WhatsAppsContext } from "../../context/WhatsApp/WhatsAppsContext";
-import api from "../../services/api";
-import toastError from "../../errors/toastError";
-import { AuthContext } from "../../context/Auth/AuthContext";
+import { WhatsAppsContext } from '../../context/WhatsApp/WhatsAppsContext';
+import api from '../../services/api';
+import toastError from '../../errors/toastError';
+import { AuthContext } from '../../context/Auth/AuthContext';
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
     flex: 1,
     padding: theme.spacing(1),
-    overflowY: "scroll",
+    overflowY: 'scroll',
     ...theme.scrollbarStyles,
   },
   searchPaper: {
-    display: "flex",
+    display: 'flex',
     padding: theme.spacing(0.5),
-    overflowY: "scroll",
+    overflowY: 'scroll',
     ...theme.scrollbarStyles,
   },
   customTableCell: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tooltip: {
-    backgroundColor: "#f5f5f9",
-    color: "rgba(0, 0, 0, 0.87)",
+    backgroundColor: '#f5f5f9',
+    color: 'rgba(0, 0, 0, 0.87)',
     fontSize: theme.typography.pxToRem(14),
-    border: "1px solid #dadde9",
+    border: '1px solid #dadde9',
     maxWidth: 450,
   },
   tooltipPopper: {
-    textAlign: "center",
+    textAlign: 'center',
   },
   buttonProgress: {
     color: green[500],
@@ -62,34 +63,34 @@ const useStyles = makeStyles((theme) => ({
     marginRight: 5,
     right: 20,
     bottom: 30,
-    color: "#ffffff",
-    border: "1px solid #CCC",
+    color: '#ffffff',
+    border: '1px solid #CCC',
     padding: 1,
     paddingLeft: 5,
     paddingRight: 5,
     borderRadius: 10,
-    fontSize: "0.9em",
+    fontSize: '0.9em',
   },
   userTag: {
     marginRight: 5,
     right: 20,
     bottom: 30,
-    background: "#511414",
-    color: "#ffffff",
-    border: "1px solid #CCC",
+    background: '#511414',
+    color: '#ffffff',
+    border: '1px solid #CCC',
     padding: 1,
     paddingLeft: 5,
     paddingRight: 5,
     borderRadius: 10,
-    fontSize: "0.9em",
+    fontSize: '0.9em',
   },
   formControl: {
     margin: theme.spacing(1.5),
     minWidth: 120,
   },
   dateContainer: {
-    display: "flex",
-    flexWrap: "wrap",
+    display: 'flex',
+    flexWrap: 'wrap',
   },
   dateTextField: {
     margin: theme.spacing(1.5),
@@ -107,11 +108,11 @@ function TicketReport() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useState({
-    queueid: "",
-    status: "",
-    userId: "",
-    startDate: "",
-    endDate: "",
+    queueid: '',
+    status: '',
+    userId: '',
+    startDate: '',
+    endDate: '',
     // startDate: new Date().toISOString().slice(0, 10),
     // endDate: new Date().toISOString().slice(0, 10),
   });
@@ -125,7 +126,7 @@ function TicketReport() {
     const conection = whatsApps
       .filter((whats) => whats.id === ticket?.whatsappId)
       .shift();
-    const result = conection?.name || "Sem Fila";
+    const result = conection?.name || 'Sem Fila';
     return result;
   };
 
@@ -140,7 +141,7 @@ function TicketReport() {
   const getQueues = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/queue");
+      const { data } = await api.get('/queue');
       setQueues(data);
       setLoading(false);
     } catch (err) {
@@ -152,7 +153,7 @@ function TicketReport() {
   const getUsers = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/users");
+      const { data } = await api.get('/users');
       setUsers(data?.users);
       setLoading(false);
     } catch (err) {
@@ -164,13 +165,13 @@ function TicketReport() {
   const getListTickets = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/tickets/search/", {
+      const { data } = await api.get('/tickets/search/', {
         params: {
           pageNumber: 1,
           status: searchParams.status,
           startDate: searchParams.startDate,
           endDate: searchParams.endDate,
-          searchParam: "",
+          searchParam: '',
           userId: searchParams.userId,
           queueIds: searchParams.queueid,
           withUnreadMessages: false,
@@ -192,28 +193,28 @@ function TicketReport() {
 
   const phoneFormater = (number) => {
     return number
-      .replace(/\D/g, "")
-      .replace(/(\d{2})(\d)/, "($1) $2")
-      .replace(/(\d{5})(\d)/, "$1-$2")
-      .replace(/(-\d{4})\d+?$/, "$1");
+      .replace(/\D/g, '')
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{5})(\d)/, '$1-$2')
+      .replace(/(-\d{4})\d+?$/, '$1');
   };
 
   const statusFormater = (status) => {
     let formattedStatus = status;
-    let backgroundColor = "transparent";
+    let backgroundColor = 'transparent';
 
     switch (status) {
-      case "closed":
-        formattedStatus = "Fechado";
-        backgroundColor = "#b30000";
+      case 'closed':
+        formattedStatus = 'Fechado';
+        backgroundColor = '#b30000';
         break;
-      case "open":
-        formattedStatus = "Aberto";
-        backgroundColor = "#005e00";
+      case 'open':
+        formattedStatus = 'Aberto';
+        backgroundColor = '#005e00';
         break;
-      case "pending":
-        formattedStatus = "Andamento";
-        backgroundColor = "#e4e500";
+      case 'pending':
+        formattedStatus = 'Andamento';
+        backgroundColor = '#e4e500';
         break;
 
       default:
@@ -225,34 +226,42 @@ function TicketReport() {
   return (
     <MainContainer>
       <MainHeader>
-        <Title>{i18n.t("ticketReport.title")}</Title>
+        <Title>{i18n.t('ticketReport.title')}</Title>
       </MainHeader>
       <Paper className={classes.searchPaper} elevation={1}>
-        <FormControl variant="filled" className={classes.formControl}>
-          <InputLabel htmlFor="filled-age-native-simple">
-            Status do Atendimento
+        <FormControl variant="outlined" className={classes.formControl}>
+          <InputLabel
+            display="flex"
+            id="status-input-label"
+            htmlFor="outlined-status-native-simple"
+          >
+            Status
           </InputLabel>
           <Select
+            labelId="status-input-label"
             name="status"
+            label="Status do Atendimento"
             native
             value={searchParams.status}
             onChange={handleChange}
           >
-            <option value={""}></option>
-            <option value={"open"}>Aberto</option>
-            <option value={"pending"}>Andamento</option>
-            <option value={"closed"}>Fechado</option>
+            <option value={''}></option>
+            <option value={'open'}>Aberto</option>
+            <option value={'pending'}>Andamento</option>
+            <option value={'closed'}>Fechado</option>
           </Select>
         </FormControl>
-        <FormControl variant="filled" className={classes.formControl}>
-          <InputLabel htmlFor="filled-age-native-simple">Fila</InputLabel>
+        <FormControl variant="outlined" className={classes.formControl}>
+          <InputLabel htmlFor="outlined-queue-native-simple">Fila</InputLabel>
           <Select
+            labelId="queue-input-label"
             name="queueid"
             native
+            label="Fila"
             value={searchParams.queueid}
             onChange={handleChange}
           >
-            <option value={""}></option>
+            <option value={''}></option>
             {queues &&
               queues.map((queue) => (
                 <option key={queue.id} value={queue.id}>
@@ -261,15 +270,17 @@ function TicketReport() {
               ))}
           </Select>
         </FormControl>
-        <FormControl variant="filled" className={classes.formControl}>
-          <InputLabel htmlFor="filled-age-native-simple">Usuário</InputLabel>
+        <FormControl variant="outlined" className={classes.formControl}>
+          <InputLabel htmlFor="outlined-user-native-simple">Usuário</InputLabel>
           <Select
+            labelId="user-input-label"
             name="userId"
             native
+            label="Usuário"
             value={searchParams.userId}
             onChange={handleChange}
           >
-            <option value={""}></option>
+            <option value={''}></option>
             {users &&
               users.map((user) => (
                 <option key={user.id} value={user.id}>
@@ -288,7 +299,7 @@ function TicketReport() {
               defaultValue={new Date().toISOString().slice(0, 10)}
               className={classes.dateTextField}
               onChange={handleChange}
-              variant="filled"
+              variant="outlined"
             />
           </form>
         </div>
@@ -302,7 +313,7 @@ function TicketReport() {
               defaultValue={new Date().toISOString().slice(0, 10)}
               className={classes.dateTextField}
               onChange={handleChange}
-              variant="filled"
+              variant="outlined"
             />
           </form>
         </div>
@@ -321,19 +332,19 @@ function TicketReport() {
           <TableHead>
             <TableRow>
               <TableCell align="center">
-                {i18n.t("ticketReport.table.name")}
+                {i18n.t('ticketReport.table.name')}
               </TableCell>
               <TableCell align="center">
-                {i18n.t("ticketReport.table.whatsapp")}
+                {i18n.t('ticketReport.table.whatsapp')}
               </TableCell>
               <TableCell align="center">
-                {i18n.t("ticketReport.table.status")}
+                {i18n.t('ticketReport.table.status')}
               </TableCell>
               <TableCell align="center">
-                {i18n.t("ticketReport.table.queue")}
+                {i18n.t('ticketReport.table.queue')}
               </TableCell>
               <TableCell align="center">
-                {i18n.t("ticketReport.table.connection")}
+                {i18n.t('ticketReport.table.connection')}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -348,7 +359,7 @@ function TicketReport() {
                     </TableCell>
                     <TableCell align="center">
                       <div
-                        id={"statusTag-" + ticket.id}
+                        id={'statusTag-' + ticket.id}
                         style={{
                           backgroundColor: statusFormater(ticket.status)
                             .backgroundColor,
@@ -361,18 +372,18 @@ function TicketReport() {
                     <TableCell align="center">
                       {
                         <div
-                          id={"queueTag-" + ticket.id}
+                          id={'queueTag-' + ticket.id}
                           style={{ backgroundColor: ticket.queue?.color }}
                           className={classes.tagColors}
                         >
-                          {ticket.queue?.name || "Sem Fila"}
+                          {ticket.queue?.name || 'Sem Fila'}
                         </div>
                       }
                     </TableCell>
                     <TableCell align="center">
                       {
                         <div
-                          id={"conectionTag-" + ticket.id}
+                          id={'conectionTag-' + ticket.id}
                           className={classes.userTag}
                         >
                           {conectionName(ticket)}
