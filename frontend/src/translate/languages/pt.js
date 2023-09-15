@@ -54,7 +54,7 @@ const messages = {
       ticketReport: {
         title: "Relatório de Tickets",
         table: {
-          name: "Nome",
+          name: "Nome Do Contato",
           whatsapp: "WhatsApp",
           email: "Email",
           actions: "Ações",
