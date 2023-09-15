@@ -42,11 +42,11 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
       if (whatsapp && whatsapp.session) {
         sessionCfg = JSON.parse(whatsapp.session);
       }
-	  
+
 	  const wbot: Session = new Client({
         session: sessionCfg,
         authStrategy: new LocalAuth({clientId: 'bd_'+whatsapp.id}),
-        puppeteer: { 
+        puppeteer: {
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
           executablePath: process.env.CHROME_BIN || undefined
       },
@@ -126,7 +126,7 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
 
         resolve(wbot);
       });
-    } catch (err) {
+    } catch (err: any) {
       logger.error(err);
     }
   });
@@ -148,7 +148,7 @@ export const removeWbot = (whatsappId: number): void => {
       sessions[sessionIndex].destroy();
       sessions.splice(sessionIndex, 1);
     }
-  } catch (err) {
+  } catch (err: any) {
     logger.error(err);
   }
 };
