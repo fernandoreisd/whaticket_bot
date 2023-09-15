@@ -12,10 +12,7 @@ interface Response {
   hasMore: boolean;
 }
 
-const ListContactsService = async ({
-  searchParam = "",
-  pageNumber = "1"
-}: Request): Promise<Response> => {
+const ListContactsService = async ({searchParam = "", pageNumber = "1"}: Request): Promise<Response> => {
   const whereCondition = {
     [Op.or]: [
       {

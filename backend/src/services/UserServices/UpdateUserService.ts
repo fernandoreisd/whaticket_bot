@@ -40,7 +40,7 @@ const UpdateUserService = async ({
 
   try {
     await schema.validate({ email, password, profile, name });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 

@@ -39,7 +39,7 @@ describe("User", () => {
         email: "teste@sameemail.com",
         password: faker.internet.password()
       });
-    } catch (err) {
+    } catch (err: any) {
       expect(err).toBeInstanceOf(AppError);
       expect(err.statusCode).toBe(400);
     }

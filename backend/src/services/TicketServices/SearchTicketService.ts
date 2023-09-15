@@ -65,6 +65,7 @@ const SearchTicketService = async ({searchParam = "", pageNumber = "1",startDate
   if (startDate && endDate) {
     whereCondition = {
       ...whereCondition,
+      // @ts-ignore
       [Op.or]: [{createdAt: {[Op.between]: [startDate, endDate]}}]
     };
   }

@@ -32,13 +32,7 @@ interface TicketData {
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const {
-    pageNumber,
-    status,
-    date,
-    searchParam,
-    showAll,
-    queueIds: queueIdsStringified,
+  const {pageNumber, status, date, searchParam, showAll, queueIds: queueIdsStringified,
     withUnreadMessages
   } = req.query as IndexQuery;
 
@@ -143,21 +137,24 @@ export const remove = async (req: Request, res: Response): Promise<Response> => 
 };
 
 
+
+
 export const search = async (req: Request, res: Response): Promise<Response> => {
   const { pageNumber,
-    status,
-    startDate,
-    endDate,
-    searchParam,
-    userId,
-    queueIds,
-    withUnreadMessages
-  } = req.query as SearchRequest;
+          status,
+          startDate,
+          endDate,
+          searchParam,
+          userId,
+          queueIds,
+          withUnreadMessages
+  } = req.query as unknown as SearchRequest;
 
-  const queueIds_: number[] = [];
+  let queueIds_: number[] = [];
 
   if (queueIds) {
-    const ids = queueIds.split(',')
+    const _ids = queueIds+''
+    const ids = _ids.split(',')
     ids.forEach((id: string)=>{
       const number = parseInt(id)
       if(isNaN(number))return
