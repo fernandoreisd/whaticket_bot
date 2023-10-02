@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useReducer, useState } from 'react';
-import MainContainer from '../../components/MainContainer';
+import Container from '@material-ui/core/Container';
 import MainHeader from '../../components/MainHeader';
 import { i18n } from '../../translate/i18n';
 import Title from '../../components/Title';
@@ -27,19 +27,17 @@ import { WhatsAppsContext } from '../../context/WhatsApp/WhatsAppsContext';
 import api from '../../services/api';
 import toastError from '../../errors/toastError';
 import { AuthContext } from '../../context/Auth/AuthContext';
+import Pagination from '@material-ui/lab/Pagination';
 
 const useStyles = makeStyles((theme) => ({
   mainPaper: {
     flex: 1,
     padding: theme.spacing(1),
-    overflowY: 'scroll',
-    ...theme.scrollbarStyles,
   },
   searchPaper: {
     display: 'flex',
     padding: theme.spacing(0.5),
-    overflowY: 'scroll',
-    ...theme.scrollbarStyles,
+    overflowY: 'hidden',
   },
   customTableCell: {
     display: 'flex',
@@ -100,9 +98,14 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1.5),
     minWidth: 120,
   },
+  paginationContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
 }));
 
 function TicketReport() {
+  const classes = useStyles();
   const { whatsApps } = useContext(WhatsAppsContext);
   const [queues, setQueues] = useState([]);
   const [users, setUsers] = useState([]);
@@ -113,14 +116,19 @@ function TicketReport() {
     userId: '',
     startDate: '',
     endDate: '',
-    // startDate: new Date().toISOString().slice(0, 10),
-    // endDate: new Date().toISOString().slice(0, 10),
   });
   const [listTickets, setListTickets] = useState({});
 
-  //
+  const [page, setPage] = useState(1);
+  const [numberPages, setNumberPages] = useState(1);
 
-  const classes = useStyles();
+  const handlePage = (event, value) => {
+    setPage(value);
+  };
+
+  useEffect(() => {
+    getListTickets();
+  }, [page]);
 
   const conectionName = (ticket) => {
     const conection = whatsApps
@@ -167,7 +175,7 @@ function TicketReport() {
     try {
       const { data } = await api.get('/tickets/search/', {
         params: {
-          pageNumber: 1,
+          pageNumber: page,
           status: searchParams.status,
           startDate: searchParams.startDate,
           endDate: searchParams.endDate,
@@ -177,6 +185,11 @@ function TicketReport() {
           withUnreadMessages: false,
         },
       });
+      if (data.hasMore) {
+        const numeroDePaginas = Math.ceil(+data.count / +data.tickets.length);
+        setNumberPages(numeroDePaginas);
+      }
+
       setListTickets(data);
       setLoading(false);
     } catch (err) {
@@ -224,7 +237,7 @@ function TicketReport() {
   };
 
   return (
-    <MainContainer>
+    <Container maxWidth={false}>
       <MainHeader>
         <Title>{i18n.t('ticketReport.title')}</Title>
       </MainHeader>
@@ -397,7 +410,15 @@ function TicketReport() {
           </TableBody>
         </Table>
       </Paper>
-    </MainContainer>
+      <div className={classes.paginationContainer}>
+        <Pagination
+          count={numberPages}
+          variant="outlined"
+          shape="rounded"
+          onChange={handlePage}
+        />
+      </div>
+    </Container>
   );
 }
 
