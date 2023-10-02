@@ -11,7 +11,9 @@ import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService
 import ShowQueueService from "../services/QueueService/ShowQueueService";
 import ShowUserService from "../services/UserServices/ShowUserService";
 import formatBody from "../helpers/Mustache";
-import SearchTicketService, {SearchRequest} from "../services/TicketServices/SearchTicketService";
+import SearchTicketService, {
+  SearchRequest
+} from "../services/TicketServices/SearchTicketService";
 
 type IndexQuery = {
   searchParam: string;
