@@ -11,6 +11,9 @@ import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService
 import ShowQueueService from "../services/QueueService/ShowQueueService";
 import ShowUserService from "../services/UserServices/ShowUserService";
 import formatBody from "../helpers/Mustache";
+import SearchTicketService, {
+  SearchRequest
+} from "../services/TicketServices/SearchTicketService";
 
 type IndexQuery = {
   searchParam: string;
@@ -31,13 +34,7 @@ interface TicketData {
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const {
-    pageNumber,
-    status,
-    date,
-    searchParam,
-    showAll,
-    queueIds: queueIdsStringified,
+  const {pageNumber, status, date, searchParam, showAll, queueIds: queueIdsStringified,
     withUnreadMessages
   } = req.query as IndexQuery;
 
@@ -85,10 +82,7 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(contact);
 };
 
-export const update = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const update = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
   const ticketData: TicketData = req.body;
 
@@ -127,10 +121,7 @@ export const update = async (
   return res.status(200).json(ticket);
 };
 
-export const remove = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const remove = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
 
   const ticket = await DeleteTicketService(ticketId);
@@ -145,4 +136,45 @@ export const remove = async (
     });
 
   return res.status(200).json({ message: "ticket deleted" });
+};
+
+
+
+
+export const search = async (req: Request, res: Response): Promise<Response> => {
+  const { pageNumber,
+          status,
+          startDate,
+          endDate,
+          searchParam,
+          userId,
+          queueIds,
+          withUnreadMessages
+  } = req.query as unknown as SearchRequest;
+
+  let queueIds_: number[] = [];
+
+  if (queueIds) {
+    const _ids = queueIds+''
+    const ids = _ids.split(',')
+    ids.forEach((id: string)=>{
+      const number = parseInt(id)
+      if(isNaN(number))return
+      queueIds_.push(number)
+    })
+  }
+
+  const { tickets, count, hasMore } = await SearchTicketService({
+    searchParam,
+    pageNumber,
+    status,
+    startDate,
+    endDate,
+    userId,
+    queueIds:queueIds_,
+    withUnreadMessages
+  });
+
+  return res.status(200).json({ tickets, count, hasMore });
+
 };

@@ -16,6 +16,8 @@ import Queues from "../pages/Queues/";
 import { AuthProvider } from "../context/Auth/AuthContext";
 import { WhatsAppsProvider } from "../context/WhatsApp/WhatsAppsContext";
 import Route from "./Route";
+import TicketReport from "../pages/TicketReport/TicketReport";
+
 
 const Routes = () => {
   return (
@@ -31,6 +33,12 @@ const Routes = () => {
                 exact
                 path="/tickets/:ticketId?"
                 component={Tickets}
+                isPrivate
+              />
+              <Route
+                exact
+                path="/ticketReport"
+                component={TicketReport}
                 isPrivate
               />
               <Route

@@ -51,6 +51,18 @@ const messages = {
           }
         }
       },
+      ticketReport: {
+        title: "Relatório de Tickets",
+        table: {
+          name: "Nome Do Contato",
+          whatsapp: "WhatsApp",
+          email: "Email",
+          actions: "Ações",
+          status: "Status",
+          queue: "Fila",
+          connection : 'Conexão'
+        }
+      },
       connections: {
         title: "Conexões",
         toasts: {
@@ -285,6 +297,7 @@ const messages = {
           contacts: "Contatos",
           quickAnswers: "Respostas Rápidas",
           queues: "Filas",
+          ticketReport: "Relatório de Tickets",
           administration: "Administração",
           users: "Usuários",
           settings: "Configurações",

@@ -71,13 +71,13 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   try {
     await schema.validate(newContact);
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 
   await CheckIsValidContact(newContact.number);
   const validNumber : any = await CheckContactNumber(newContact.number)
-  
+
   //const profilePicUrl = await GetProfilePicUrl(validNumber);
   const profilePicUrl = "/default-profile.png"; // Default Avatar
 
@@ -127,7 +127,7 @@ export const update = async (
 
   try {
     await schema.validate(contactData);
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 

@@ -1,4 +1,3 @@
-const axios = require('axios')
 import { join } from "path";
 import { promisify } from "util";
 import { writeFile } from "fs";
@@ -31,6 +30,7 @@ import CreateContactService from "../ContactServices/CreateContactService";
 import GetContactService from "../ContactServices/GetContactService";
 import formatBody from "../../helpers/Mustache";
 import { Op } from "sequelize";
+const axios = require('axios')
 
 interface Session extends Client {
   id?: number;
@@ -66,7 +66,7 @@ try {
   const contact = CreateOrUpdateContactService(contactData);
   return contact;
 }
-catch (err) {
+catch (err: any) {
   const profilePicUrl = "/default-profile.png"; // Foto de perfil padrão
   const contactData = {
       name: msgContact.name || msgContact.pushname || msgContact.id.user,
@@ -127,8 +127,8 @@ media.filename = `${new Date().getTime()}${originalFilename}.${ext}`;
     );
 
 
-    
-  } catch (err) {
+
+  } catch (err: any) {
     Sentry.captureException(err);
     logger.error(err);
   }
@@ -246,7 +246,7 @@ const verifyQueue = async (
 
 const isValidMsg = (msg: WbotMessage): boolean => {
   if (msg.from === "status@broadcast") return false;
-  
+
   if (
     msg.type === "chat" ||
     msg.type === "audio" ||
@@ -342,9 +342,9 @@ const handleMessage = async (
       formatBody(whatsapp.farewellMessage, contact) === msg.body
     )
       return;
-	  
+
    	//SETA SE A MENSAGEM E DE ENTRADA (in) OU DE SAIDA (out)
-    const direction = msg.fromMe  
+    const direction = msg.fromMe
 
     //console.log(quotedMsg)
 
@@ -375,7 +375,7 @@ const handleMessage = async (
         unreadMessages,
         groupContact
       );
-    }    
+    }
 
     if (msg.hasMedia) {
       await verifyMediaMessage(msg, ticket, contact);
@@ -481,13 +481,13 @@ const handleMessage = async (
         console.log(error);
       }
     } */
-	
+
 	        /**********************************************************************************************************/
         //INTEGRAÇÃO WHATICKET BOTPRESS
         //userId ==> é o id do usuario bot no whaticket
-        //direction ==> false - mensagens de entrada1	
+        //direction ==> false - mensagens de entrada1
         //WhatsappId = whatsapp.id
-        
+
         console.log('/************************DEFINE A URL DO BOT DEPENDENDO DO WHATSAPPID**************************************')
         //var urlBot = `http://181.189.44.110:3000/api/v1/bots/clinica_mama_1/converse/${contact.number}`
         var urlBot = `${process.env.URL_BOT}${contact.number}`
@@ -495,7 +495,7 @@ const handleMessage = async (
             default:
                 console.log(urlBot)
                 console.log(ticket.userId,direction,msg.type)
-        }        
+        }
         console.log('/**********************************************************************************************************')
 
         if (ticket.userId === 2 && direction == false && msg.type !== "call_log") {
@@ -520,11 +520,11 @@ const handleMessage = async (
                             //msgText ==> end indica q o fluxo encerrou no BotPress
                             //O ticket retorna para fila para um atendente poder seguir o atendimento
                             console.log(msgText)
-                            
+
                             let option = msgText.split(":")
-                            let bot_status = "pending" 
-                            let bot_userId = null   
-                            let bot_queueId = null   
+                            let bot_status = "pending"
+                            let bot_userId = null
+                            let bot_queueId = null
 
                             switch(option[0]){
                                 case 'end':
@@ -532,8 +532,8 @@ const handleMessage = async (
                                         if(option[1] !== 'fha'){
                                             option[1] = '1'
                                         }
-                                    }   
-                                                                   
+                                    }
+
                                     switch(option[1]){
                                         case '1':
                                             msgText = '*Marcação de Consultas e Exames*\r\n'
@@ -543,39 +543,39 @@ const handleMessage = async (
                                             +'Unidade (Asa Norte, Asa Sul ou Taguatinga):\r\n'
                                             +'Convênio:\r\n'
                                             +'Para agendar exames é necessário enviar foto do pedido médico. Caso seja consulta, informar *Especialidade* desejada\r\n'
-                                            ticket.queueId = 5                                    
-                                            bot_queueId = '5'   
-                                        break 
-                                        
+                                            ticket.queueId = 5
+                                            bot_queueId = '5'
+                                        break
+
                                         case '4':
                                             msgText = '*Ouvidoria*'
-                                            ticket.queueId = 9                                    
-                                            bot_queueId = '9'   
-                                        break 
+                                            ticket.queueId = 9
+                                            bot_queueId = '9'
+                                        break
 
                                         case '5':
                                             msgText = '*Cartão Anjo*'
-                                            ticket.queueId = 4                                    
-                                            bot_queueId = '4'   
-                                        break 
-                                            
+                                            ticket.queueId = 4
+                                            bot_queueId = '4'
+                                        break
+
                                         default:
                                             msgText = '*Marcação de consultas e/ou exames*'
-                                            ticket.queueId = 5 
-                                            bot_queueId = '5'                               
+                                            ticket.queueId = 5
+                                            bot_queueId = '5'
                                     }
-    
+
                                     await ticket.update({
                                         status: bot_status,
                                         userId: bot_userId,
                                         queueId: bot_queueId
                                     });
-                                    
+
                                     //Apenas envia menssagem para o whatsapp dento do horario de atendimento
                                     if(option[1] !== 'fha'){
                                         const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para* ${msgText}`);
-                                        await verifyMessage(sentMessage, ticket, contact);                                
-                                    }  
+                                        await verifyMessage(sentMessage, ticket, contact);
+                                    }
                                 break;
 
                                 case 'end_resultado_exames':
@@ -584,38 +584,38 @@ const handleMessage = async (
                                         if(option[1] !== 'fha'){
                                             option[1] = '1'
                                         }
-                                    }  
-                                                                   
+                                    }
+
                                     switch(option[1]){
                                         case '1':
                                             msgText = 'Resultado Asa Sul'
-                                            ticket.queueId = 11                                    
-                                            bot_queueId = '11'   
-                                        break    
-                                            
+                                            ticket.queueId = 11
+                                            bot_queueId = '11'
+                                        break
+
                                         case '2':
                                             msgText = 'Resultado Asa Norte'
-                                            ticket.queueId = 10 
-                                            bot_queueId = '10'                               
-                                        break    
-                                            
+                                            ticket.queueId = 10
+                                            bot_queueId = '10'
+                                        break
+
                                         case '3':
                                             msgText = 'Resultado Taguatinga'
-                                            ticket.queueId = 12 
-                                            bot_queueId = '12'                               
-                                        break;  
+                                            ticket.queueId = 12
+                                            bot_queueId = '12'
+                                        break;
                                     }
-    
+
                                     await ticket.update({
                                         status: bot_status,
                                         userId: bot_userId,
                                         queueId: bot_queueId
                                     });
-                                    
+
                                     //Apenas envia menssagem para o whatsapp dento do horario de atendimento
                                     if(option[1] !== 'fha'){
                                         const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
-                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                        await verifyMessage(sentMessage, ticket, contact);
                                     }
                                 break;
 
@@ -625,46 +625,46 @@ const handleMessage = async (
                                         if(option[1] !== 'fha'){
                                             option[1] = '1'
                                         }
-                                    }                                                                     
+                                    }
                                     switch(option[1]){
                                         case '1':
                                             msgText = '*Autorização Asa Sul*'
                                             +'\r\nVocê selecionou a opção Autorização, envie sua documentação e caso já tenha enviado '
                                             +'recebemos sua mensagem e em breve daremos entrada em sua solicitação em um prazo de até '
                                             +'48 horas. Caso faltem documentos, solicitaremos através desse viés. 😉'
-                                            ticket.queueId = 2                                    
-                                            bot_queueId = '2'   
-                                        break    
-                                            
+                                            ticket.queueId = 2
+                                            bot_queueId = '2'
+                                        break
+
                                         case '2':
                                             msgText = '*Autorização Asa Norte*'
                                             +'\r\nVocê selecionou a opção Autorização, envie sua documentação e caso já tenha enviado '
                                             +'recebemos sua mensagem e em breve daremos entrada em sua solicitação em um prazo de até '
                                             +'48 horas. Caso faltem documentos, solicitaremos através desse viés. 😉'
                                             ticket.queueId = 1
-                                            bot_queueId = '1'                               
-                                        break    
-                                            
+                                            bot_queueId = '1'
+                                        break
+
                                         case '3':
                                             msgText = '*Autorização Taguatinga*'
                                             +'\r\nVocê selecionou a opção Autorização, envie sua documentação e caso já tenha enviado '
                                             +'recebemos sua mensagem e em breve daremos entrada em sua solicitação em um prazo de até '
                                             +'48 horas. Caso faltem documentos, solicitaremos através desse viés. 😉'
-                                            ticket.queueId = 3 
-                                            bot_queueId = '3'                               
-                                        break; 
+                                            ticket.queueId = 3
+                                            bot_queueId = '3'
+                                        break;
                                     }
-    
+
                                     await ticket.update({
                                         status: bot_status,
                                         userId: bot_userId,
                                         queueId: bot_queueId
                                     });
-                                    
+
                                     //Apenas envia menssagem para o whatsapp dento do horario de atendimento
                                     if(option[1] !== 'fha'){
                                         const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para* ${msgText}.`);
-                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                        await verifyMessage(sentMessage, ticket, contact);
                                     }
                                 break;
 
@@ -674,39 +674,39 @@ const handleMessage = async (
                                         if(option[1] !== 'fha'){
                                             option[1] = '1'
                                         }
-                                    }  
-                                                                   
+                                    }
+
                                     switch(option[1]){
                                         case '1':
                                             msgText = 'Médicos Asa Sul'
-                                            ticket.queueId = 7                                    
-                                            bot_queueId = '7'   
+                                            ticket.queueId = 7
+                                            bot_queueId = '7'
                                         break;
-                                        
+
                                         case '2':
                                             msgText = 'Médicos Asa Norte'
-                                            ticket.queueId = 10                                    
-                                            bot_queueId = '10'   
+                                            ticket.queueId = 10
+                                            bot_queueId = '10'
                                         break;
 
                                         case '3':
                                             msgText = 'Médicos Taguatinga'
-                                            ticket.queueId = 8                                    
-                                            bot_queueId = '8'   
+                                            ticket.queueId = 8
+                                            bot_queueId = '8'
                                         break;
 
                                     }
-    
+
                                     await ticket.update({
                                         status: bot_status,
                                         userId: bot_userId,
                                         queueId: bot_queueId
                                     });
-                                    
+
                                     //Apenas envia menssagem para o whatsapp dento do horario de atendimento
                                     if(option[1] !== 'fha'){
                                         const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
-                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                        await verifyMessage(sentMessage, ticket, contact);
                                     }
                                 break;
 
@@ -717,25 +717,25 @@ const handleMessage = async (
                                         if(option[1] !== 'fha'){
                                             option[1] = '1'
                                         }
-                                    }  
-                                                                   
+                                    }
+
                                     switch(option[1]){
                                         default:
                                             msgText = 'Médicos Asa Sul->Angiologia'
-                                            ticket.queueId = 10                                    
-                                            bot_queueId = '10'   
+                                            ticket.queueId = 10
+                                            bot_queueId = '10'
                                     }
-    
+
                                     await ticket.update({
                                         status: bot_status,
                                         userId: bot_userId,
                                         queueId: bot_queueId
                                     });
-                                    
+
                                     //Apenas envia menssagem para o whatsapp dento do horario de atendimento
                                     if(option[1] !== 'fha'){
                                         const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
-                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                        await verifyMessage(sentMessage, ticket, contact);
                                     }
                                 break;
 
@@ -745,25 +745,25 @@ const handleMessage = async (
                                         if(option[1] !== 'fha'){
                                             option[1] = '1'
                                         }
-                                    }  
-                                                                   
+                                    }
+
                                     switch(option[1]){
                                         default:
                                             msgText = 'Médicos Asa Sul->Cirurgia Plástica'
-                                            ticket.queueId = 10                                    
-                                            bot_queueId = '10'   
+                                            ticket.queueId = 10
+                                            bot_queueId = '10'
                                     }
-    
+
                                     await ticket.update({
                                         status: bot_status,
                                         userId: bot_userId,
                                         queueId: bot_queueId
                                     });
-                                    
+
                                     //Apenas envia menssagem para o whatsapp dento do horario de atendimento
                                     if(option[1] !== 'fha'){
                                         const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
-                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                        await verifyMessage(sentMessage, ticket, contact);
                                     }
                                 break;
 
@@ -773,25 +773,25 @@ const handleMessage = async (
                                         if(option[1] !== 'fha'){
                                             option[1] = '1'
                                         }
-                                    }  
-                                                                   
+                                    }
+
                                     switch(option[1]){
                                         default:
                                             msgText = 'Médicos Asa Sul->Ginecologia'
-                                            ticket.queueId = 10                                    
-                                            bot_queueId = '10'   
+                                            ticket.queueId = 10
+                                            bot_queueId = '10'
                                     }
-    
+
                                     await ticket.update({
                                         status: bot_status,
                                         userId: bot_userId,
                                         queueId: bot_queueId
                                     });
-                                    
+
                                     //Apenas envia menssagem para o whatsapp dento do horario de atendimento
                                     if(option[1] !== 'fha'){
                                         const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
-                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                        await verifyMessage(sentMessage, ticket, contact);
                                     }
                                 break;
 
@@ -801,25 +801,25 @@ const handleMessage = async (
                                         if(option[1] !== 'fha'){
                                             option[1] = '1'
                                         }
-                                    }  
-                                                                   
+                                    }
+
                                     switch(option[1]){
                                         default:
                                             msgText = 'Médicos Asa Sul->Mastologia Feminino'
-                                            ticket.queueId = 10                                    
-                                            bot_queueId = '10'   
+                                            ticket.queueId = 10
+                                            bot_queueId = '10'
                                     }
-    
+
                                     await ticket.update({
                                         status: bot_status,
                                         userId: bot_userId,
                                         queueId: bot_queueId
                                     });
-                                    
+
                                     //Apenas envia menssagem para o whatsapp dento do horario de atendimento
                                     if(option[1] !== 'fha'){
                                         const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
-                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                        await verifyMessage(sentMessage, ticket, contact);
                                     }
                                 break;
 
@@ -829,25 +829,25 @@ const handleMessage = async (
                                         if(option[1] !== 'fha'){
                                             option[1] = '1'
                                         }
-                                    }  
-                                                                   
+                                    }
+
                                     switch(option[1]){
                                         default:
                                             msgText = 'Médicos Asa Sul->Mastologia Masculino'
-                                            ticket.queueId = 10                                    
-                                            bot_queueId = '10'   
+                                            ticket.queueId = 10
+                                            bot_queueId = '10'
                                     }
-    
+
                                     await ticket.update({
                                         status: bot_status,
                                         userId: bot_userId,
                                         queueId: bot_queueId
                                     });
-                                    
+
                                     //Apenas envia menssagem para o whatsapp dento do horario de atendimento
                                     if(option[1] !== 'fha'){
                                         const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, `*Você foi direcionado para ${msgText}.*`);
-                                        await verifyMessage(sentMessage, ticket, contact);                                
+                                        await verifyMessage(sentMessage, ticket, contact);
                                     }
                                 break;
 
@@ -861,7 +861,7 @@ const handleMessage = async (
                 }
             } catch (err) {
                 console.log(err)
-            }	
+            }
 		}
         /**********************************************************************************************************/
 
@@ -902,7 +902,7 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
       action: "update",
       message: messageToUpdate
     });
-    
+
   } catch (err) {
     Sentry.captureException(err);
     logger.error(`Error handling message ack. Err: ${err}`);
