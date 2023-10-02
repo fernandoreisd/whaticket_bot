@@ -45,7 +45,7 @@ const SearchTicketService = async ({searchParam = "", pageNumber = "1",startDate
   ];
 
   if (queueIds.length>0) {
-    whereCondition = { queueId: { [Op.or]: [queueIds, null] } };
+    whereCondition = { queueId: { [Op.and]: [queueIds, null] } };
   }
 
   if (userId) {
